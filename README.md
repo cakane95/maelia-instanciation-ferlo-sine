@@ -22,9 +22,11 @@ Ce projet vise à organiser les données brutes, les traiter, et les structurer 
 1. **Collecte des données :** Rassembler toutes les données nécessaires (météo, sol, exploitants, irrigation, îlots, parcelles, etc.).
 2. **Formatage des données :** Respecter les spécifications MAELIA :
    - Utilisation du séparateur `;` pour les fichiers CSV.
+   - Les décimales sont toujours des `.`.
    - Respect de l’ordre et des intitulés des colonnes.
    - Encodage UTF-8 (sans BOM).
    - Ne pas modifier les fichiers `.dbf` avec Excel (privilégier R ou QGIS).
+   - Ne pas modifier les fichiers `.csv` avec Excel (privilegier R ou Pyhton).
 3. **Structuration des données :**
    - Traiter les données brutes avec les scripts du dossier `scripts/`.
    - Organiser les résultats dans `diohine/modeleAgricole/` et `diohine/modeleCommun/`.
