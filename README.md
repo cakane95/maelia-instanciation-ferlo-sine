@@ -10,6 +10,7 @@ Ce projet vise à organiser les données brutes, les traiter, et les structurer 
 ## Structure du dépôt
 
 - `data/` — Données brutes (fichiers shapefile, exports CSV, autres fichiers sources).
+- `notebooks/` — Notebooks jupyters
 - `scripts/` — Scripts de traitement et de formatage des données.
 - `diohine/` — Données prêtes pour MAELIA :
   - `modeleAgricole/`
@@ -35,6 +36,8 @@ Ce projet vise à organiser les données brutes, les traiter, et les structurer 
    - Effectuer des tests d'intégration dans MAELIA (via GAMA).
 
 Les détails sur les exigences, les bonnes pratiques et les erreurs courantes sont disponibles dans la [Documentation](docs/).
+
+Les points d'attention sont disponibles [ici](issues/)
 
 ## Checklist des Données
 
