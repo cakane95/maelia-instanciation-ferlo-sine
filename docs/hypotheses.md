@@ -79,17 +79,13 @@ Les données climatiques utilisées pour l'instanciation du territoire de Diohin
 
 ---
 
-## 7. Sous-échantillonnage des années climatiques pour les tests
+## 7. Restriction des années climatiques utilisées
 
 **Hypothèse :**  
-Afin de limiter la charge mémoire et de faciliter les tests intermédiaires dans MAELIA, seules certaines années ont été sélectionnées à partir du jeu climatique complet.
-
-**Méthode :**  
-Un échantillon de **3 années par décennie** a été sélectionné aléatoirement pour représenter la variabilité climatique tout en réduisant le volume de données traité.
+Pour limiter les temps de traitement et tester le modèle de manière réaliste sur les projections futures, seules les années **de 2018 à 2050** ont été conservées dans les fichiers climatiques.
 
 **Conséquence :**  
-Les fichiers climatiques générés dans `diohine/modeleCommun/meteo/simulee/` ne couvrent pas l’ensemble des années disponibles dans les données brutes, mais un sous-ensemble représentatif.  
-Cette hypothèse est temporaire et pourra être levée une fois les tests validés.
+Les fichiers `.csv` produits dans `diohine/modeleCommun/meteo/simulee/` ne couvrent pas toute la période disponible dans les données brutes, mais se concentrent sur les années futures pertinentes pour les scénarios prospectifs.
 
 -----
 
