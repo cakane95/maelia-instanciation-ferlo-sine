@@ -77,6 +77,20 @@ Les données climatiques utilisées pour l'instanciation du territoire de Diohin
 - Les simulations utilisées sont issues de la phase **CMIP6** (Coupled Model Intercomparison Project Phase 6).
 - Les données correspondent à des projections climatiques historiques et futures, fournies à une résolution standard adaptée aux études régionales.
 
+---
+
+## 7. Sous-échantillonnage des années climatiques pour les tests
+
+**Hypothèse :**  
+Afin de limiter la charge mémoire et de faciliter les tests intermédiaires dans MAELIA, seules certaines années ont été sélectionnées à partir du jeu climatique complet.
+
+**Méthode :**  
+Un échantillon de **3 années par décennie** a été sélectionné aléatoirement pour représenter la variabilité climatique tout en réduisant le volume de données traité.
+
+**Conséquence :**  
+Les fichiers climatiques générés dans `diohine/modeleCommun/meteo/simulee/` ne couvrent pas l’ensemble des années disponibles dans les données brutes, mais un sous-ensemble représentatif.  
+Cette hypothèse est temporaire et pourra être levée une fois les tests validés.
+
 -----
 
 *(D'autres hypothèses seront ajoutées au fur et à mesure de l'avancement du projet.)*
