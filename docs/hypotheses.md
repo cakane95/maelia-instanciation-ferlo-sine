@@ -87,6 +87,48 @@ Pour limiter les temps de traitement et tester le modèle de manière réaliste 
 **Conséquence :**  
 Les fichiers `.csv` produits dans `diohine/modeleCommun/meteo/simulee/` ne couvrent pas toute la période disponible dans les données brutes, mais se concentrent sur les années futures pertinentes pour les scénarios prospectifs.
 
+---
+
+## 8. Construction des zones pédologiques (ZONE_PEDO)
+
+**Hypothèse :**  
+Les `ZONE_PEDO` sont construites à partir des retours d’entretiens de terrain et d’une analyse des comportements agronomiques associés à chaque type de sol (`STU_DOM`).
+
+Conformément à la documentation MAELIA :
+> "Le critère de spatialisation ‘zone pédologique’ fait référence à un sol ou un groupe de sols homogènes d’un point de vue agronomique : les cultures y sont conduites de la même façon."
+
+Cela signifie qu’un sol doit être assigné à une `ZONE_PEDO` distincte **si sa gestion diffère des autres**, même s’il appartient à la même famille pédologique.
+
+---
+
+### Exemple de différenciation observée lors des entretiens
+
+| STU_DOM        | Type de sol        | Rendement estimé | Effort requis | ZONE_PEDO assignée |
+|----------------|--------------------|------------------|----------------|---------------------|
+| STU_ARG_01     | Argileux profond   | Élevé 🌾         | Élevé 🧑‍🌾     | ZP_ARG01            |
+| STU_ARG_02     | Argileux compact   | Faible 🌱         | Faible 💤      | ZP_ARG02 ✅         |
+| STU_SABL_01    | Sableux filtrant   | Moyen 🌿          | Moyen ⚙️      | ZP_SABL01           |
+
+---
+
+### Conséquences dans MAELIA
+
+La `ZONE_PEDO` est utilisée pour :
+- 📋 Affecter les **itinéraires techniques** (ITK)
+- 🚜 Définir le **type de matériel agricole** (ex. irrigation)
+- 🧩 Lier chaque `ILOT` à une stratégie culturale via le `ID_SOL`
+
+---
+
+### Relation entre les champs
+
+```text
+[STU_DOM]  →  type de sol unique
+[ZONE_PEDO]  →  groupe de sols conduits de la même façon
+[ZH]         →  zone hydrographique (fixée à 1 pour Diohine)
+[ID_SOL]     = ZH-STU_DOM-ZONE_PEDO
+
+
 -----
 
 *(D'autres hypothèses seront ajoutées au fur et à mesure de l'avancement du projet.)*
