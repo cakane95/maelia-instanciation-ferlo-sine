@@ -14,3 +14,6 @@ Thumbs.db
 
 # Fichiers climatiques générés pour MAELIA
 diohine/modeleCommun/meteo/simulee/*.csv
+
+# Fichiers joursParMois pour MAELIA
+diohine/modeleCommun/date/*.csv

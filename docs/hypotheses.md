@@ -40,9 +40,10 @@ Conversion systématique du format initial (`YYYY-MM-DD`) vers `DD/MM/YYYY`.
 **Hypothèse :**  
 Les fichiers climatiques CNRM-ESM2-1 ne fournissant pas directement l'ETP, celle-ci est approximée via la formule simplifiée de **Hargreaves-Samani** :
 
-\[
+$$ \[
 \text{ETP} = 0.0023 \times (\text{Tmax} - \text{Tmin})^{0.5} \times (\text{Tmax} + \text{Tmin} + 17.8)
-\]
+\] 
+$$
 
 **Conséquence :**  
 ETP exprimée en **mm/jour**.
