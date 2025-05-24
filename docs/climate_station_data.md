@@ -2,17 +2,18 @@
 
 ## 1. Origine et période des données
 
-Les données analysées dans ce fichier proviennent de la tour à flux installée à Niakhar (station SOB) et ont été fournies par Olivier Roupsard (CIRAD). Elles couvrent la période de 2018 à 2024. Ces mesures proviennent d’une instrumentation automatisée centralisée, enregistrant de nombreuses variables toutes les **30 minutes**.
+Les données analysées proviennent de la tour à flux installée à Niakhar (station SOB), fournies par Olivier Roupsard (CIRAD).  
+Elles couvrent la période de **2018 à 2024** et sont enregistrées toutes les **30 minutes** par une instrumentation automatisée multi-capteurs.
 
 ---
 
 ## 2. Description générale du fichier
 
-Nom du fichier source : `donnees_station_SOB.xlsx`  
-Format : Fichier Excel structuré manuellement avec en-têtes multiples  
-Objectif : Préparer ces données pour leur utilisation dans MAELIA au format journalier
+- **Nom du fichier source :** `donnees_station_SOB.xlsx`  
+- **Format :** Fichier Excel structuré manuellement avec en-têtes multiples  
+- **Objectif :** Préparer ces données pour un usage dans MAELIA au format journalier
 
-**Remarque :** la première colonne du fichier (non nommée) sert uniquement d’information auxiliaire. Elle **n’est pas une variable** utile pour le traitement et doit être ignorée.
+**Remarque :** La première colonne (sans nom) sert uniquement d’aide visuelle dans le fichier source et est ignorée lors du traitement.
 
 ---
 
@@ -20,88 +21,114 @@ Objectif : Préparer ces données pour leur utilisation dans MAELIA au format jo
 
 | Ligne | Contenu | À utiliser |
 |-------|---------|------------|
-| 1 à 8 | Métadonnées (instrumentation, logiciel, qualité, commentaires) | Non |
+| 1 à 8 | Métadonnées (instruments, logiciel, qualité, etc.) | Non |
 | 9     | Libellés lisibles (ex. Ta (°C), PREC (mm hh-1)) | Non |
-| 10    | Noms techniques des colonnes (ex. Air_Temperature_at_2_m, Precipitation) | Oui |
-| 11+   | Données climatiques toutes les 30 minutes | Oui |
+| 10    | Noms techniques des colonnes | Oui |
+| 11+   | Données toutes les 30 minutes | Oui |
 
 ---
 
 ## 4. Colonnes clés
 
-| Nom technique                    | Description                          | Unité       |
-|----------------------------------|--------------------------------------|-------------|
-| TIME_START                       | Horodatage de début de mesure        | YYYYMMDDhhmm |
-| TIME_END                         | Horodatage de fin                    | YYYYMMDDhhmm |
-| Air_Temperature_at_2_m           | Température de l'air à 2 m           | °C           |
-| Precipitation                    | Précipitation (déjà convertie en mm/h) | mm/h         |
-| Net_radiation_1                  | Rayonnement net global               | W/m²        |
-| Relative_Humidity                | Humidité relative                    | %           |
+| Colonne technique              | Description                                 | Unité       |
+|-------------------------------|---------------------------------------------|-------------|
+| TIME_START                    | Horodatage de début de mesure               | YYYYMMDDhhmm |
+| Air_Temperature_at_2_m        | Température de l'air à 2 mètres             | °C           |
+| Precipitation                 | Précipitations toutes les 30 min (×2)       | mm/h         |
+| Net_radiation_1               | Rayonnement net instantané                  | W/m²         |
+| Relative_Humidity             | Humidité relative                           | %            |
+| Wind_Speed                    | Vitesse du vent                             | m/s          |
 
 ---
 
 ## 5. Traitement prévu pour MAELIA
 
-| Colonne MAELIA | Source                 | Traitement journalier                     |
-|----------------|------------------------|-------------------------------------------|
-| DATE           | TIME_START             | Date extraite sans l'heure                |
-| RRmm           | Precipitation          | Somme sur 24 h                            |
-| Tmin / Tmax    | Air_Temperature_at_2_m | Min et max sur 24 h                       |
-| RGI            | Net_radiation_1        | Moyenne journalière, convertie en MJ/m²/j |
-| ETP            | À calculer             | Estimée avec la formule de Hargreaves     |
-| ID_PDG         | À ajouter              | Fixé à 1 (station unique)                 |
+| Colonne MAELIA | Source technique           | Traitement appliqué                     |
+|----------------|----------------------------|------------------------------------------|
+| DATE           | TIME_START                 | Extraction de la date (format jour)     |
+| RRmm           | Precipitation              | Somme journalière après correction      |
+| Tmin / Tmax    | Air_Temperature_at_2_m     | Min / max journaliers                   |
+| RGI            | Net_radiation_1            | Somme des conversions 30 min (MJ/m²/j)  |
+| ETP            | Calculée                   | Formule journalière Penman-Monteith FAO |
+| ID_PDG         | Ajouté manuellement        | Fixé à 1 (station centrale unique)      |
 
 ---
 
 ## 6. Justification des agrégations
 
-- Les précipitations (`RRmm`) sont cumulatives : on utilise une **somme journalière**.
-- La température sert à détecter les extrêmes : on utilise le **minimum et maximum quotidiens**.
-- Le rayonnement (`RGI`) est une puissance moyenne instantanée : on calcule la **moyenne journalière** en W/m², puis on la convertit en MJ/m²/jour via un facteur d'intégration temporelle.
+- **Précipitations :** cumulées sur 24 h après correction (voir section 8)
+- **Températures :** min et max extraits des mesures 30 min
+- **Rayonnement net :** converti en énergie reçue toutes les 30 min (MJ/m²/30min), puis agrégé
+- **ETP :** calculée à partir des moyennes journalières selon Penman-Monteith
 
 ---
 
-## 7. Étapes prévues
+## 7. Étapes de traitement
 
-1. Chargement en sautant les 9 premières lignes, en gardant les noms techniques (ligne 10)
-2. Agrégation journalière selon les règles ci-dessus
-3. Calcul de `ETP` avec la formule de Hargreaves
-4. Structuration finale et export au format MAELIA (un fichier par année)
+1. Chargement des données à partir de la ligne 10
+2. Conversion de `TIME_START` en objet `datetime`
+3. Correction de la précipitation (division par 2)
+4. Conversion de `Net_radiation_1` en MJ/m²/30min, puis cumul par jour
+5. Agrégation journalière des variables climatiques
+6. Calcul de l’ETP journalière avec la formule FAO-56 Penman-Monteith
+7. Export des résultats au format MAELIA (`DATE`, `RRmm`, `Tmin`, `Tmax`, `ETP`, `RGI`)
 
 ---
 
 ## 8. Remarque importante sur les précipitations
 
-Les valeurs de précipitation (`Precipitation`) présentes dans le fichier ont été transformées en **intensité horaire (mm/h)** à partir de mesures brutes effectuées toutes les **30 minutes**.
+Les précipitations ont été initialement exprimées en **mm/h**, issues de mesures toutes les 30 minutes **multipliées par 2**.
 
-D'après le commentaire inclus dans les premières lignes du fichier, chaque valeur a été **multipliée par 2** pour passer de mm/30min à mm/h.
-
-Or, **MAELIA attend des cumuls journaliers réels en mm**, et non des intensités.  
-Il est donc nécessaire de **revenir à l’échelle d’origine avant d’agréger**.
-
-**Méthode appliquée :**
-
-- Chaque valeur de précipitation est **divisée par 2** pour retrouver la valeur en mm/30min
-- La somme des 48 valeurs par jour donne alors un **cumul quotidien correct**
-
-Cette étape de correction est indispensable pour éviter une surestimation des précipitations journalières.
+**Correction appliquée :**
+- Chaque valeur a été **divisée par 2** pour retrouver le cumul réel sur 30 minutes
+- Ensuite, la **somme journalière** est calculée pour obtenir `RRmm`
 
 ---
 
-### 9. Remarque sur la conversion du rayonnement net
+## 9. Conversion du rayonnement net
 
-Le rayonnement net (`Net_radiation_1`) est fourni en **W/m²**, c’est-à-dire une densité de puissance instantanée.
-
-Les mesures sont enregistrées **toutes les 30 minutes**.  
-Pour convertir chaque valeur en **énergie cumulée sur 30 minutes (MJ/m²)**, on utilise le facteur suivant :
+Le rayonnement net est fourni en **W/m²** (puissance instantanée). Pour obtenir l’énergie reçue pendant chaque intervalle de 30 minutes, on applique :
 
 \[
-\text{Net_radiation_1 (MJ/m²/30min)} = \text{Net_radiation_1 (W/m²)} \times \frac{1800}{10^6} = \text{Net_radiation_1} \times \frac{1.8}{1000}
+\text{Net\_radiation\_1 (MJ/m²/30min)} = \text{Net\_radiation_1 (W/m²)} \times \frac{1800}{1\,000\,000} = \text{Net\_radiation_1} \times 0.0018
 \]
 
-Ensuite, les valeurs sont **sommées sur la journée entière** pour obtenir le cumul journalier en **MJ/m²/jour** (`RGI`).
+Ces valeurs sont ensuite **sommées par jour** pour produire `RGI` (rayonnement global intégré en MJ/m²/jour).
 
-Ce traitement permet une estimation correcte de l’énergie reçue, sans surestimer comme ce serait le cas avec un facteur horaire (`3.6 / 1000`).
+---
+
+## 10. Calcul de l’ETP avec la formule Penman-Monteith (FAO-56)
+
+L’évapotranspiration potentielle journalière est estimée selon la formule de Penman-Monteith présentée dans le guide FAO-56 et reprise dans la littérature francophone (voir référence ci-dessous).
+
+\[
+ET_0 = \frac{0.408 \cdot \Delta \cdot R_n + \gamma \cdot \frac{900}{T + 273} \cdot u_2 \cdot (e_s - e_a)}{\Delta + \gamma (1 + 0.34 \cdot u_2)}
+\]
+
+### Paramètres utilisés :
+
+| Symbole | Description                                  | Unité       |
+|---------|----------------------------------------------|-------------|
+| \( R_n \)   | Rayonnement net journalier                | MJ/m²/jour  |
+| \( T \)     | Température moyenne journalière           | °C          |
+| \( u_2 \)   | Vitesse du vent à 2 m                     | m/s         |
+| \( e_s \)   | Pression de vapeur saturante              | kPa         |
+| \( e_a \)   | Pression de vapeur réelle (via RH)        | kPa         |
+| \( \Delta \)| Pente de la courbe de saturation          | kPa/°C      |
+| \( \gamma \)| Constante psychrométrique                 | kPa/°C      |
+
+> Cette formule est appliquée **à partir de moyennes et cumuls journaliers**. Elle ne nécessite pas d’adaptation au pas de temps car tous les termes sont agrégés avant calcul.
+
+---
+
+## 11. Références
+
+- Djikou, T. (2006). *Estimation de l'évapotranspiration potentielle dans le bassin du Haut Bani (Mali) à partir des données météorologiques.*  
+  Mémoire de Master, Université de Ouagadougou – AMMA-CATCH.  
+  [https://amma-catch.osug.fr/IMG/pdf/memoire_djikou_06.pdf](https://amma-catch.osug.fr/IMG/pdf/memoire_djikou_06.pdf)
+
+- Allen, R. G., Pereira, L. S., Raes, D., & Smith, M. (1998).  
+  *Crop evapotranspiration – Guidelines for computing crop water requirements – FAO Irrigation and Drainage Paper 56.* FAO, Rome.
 
 ---
 
