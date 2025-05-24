@@ -88,4 +88,21 @@ Cette étape de correction est indispensable pour éviter une surestimation des 
 
 ---
 
+### 9. Remarque sur la conversion du rayonnement net
+
+Le rayonnement net (`Net_radiation_1`) est fourni en **W/m²**, c’est-à-dire une densité de puissance instantanée.
+
+Les mesures sont enregistrées **toutes les 30 minutes**.  
+Pour convertir chaque valeur en **énergie cumulée sur 30 minutes (MJ/m²)**, on utilise le facteur suivant :
+
+\[
+\text{Net_radiation_1 (MJ/m²/30min)} = \text{Net_radiation_1 (W/m²)} \times \frac{1800}{10^6} = \text{Net_radiation_1} \times \frac{1.8}{1000}
+\]
+
+Ensuite, les valeurs sont **sommées sur la journée entière** pour obtenir le cumul journalier en **MJ/m²/jour** (`RGI`).
+
+Ce traitement permet une estimation correcte de l’énergie reçue, sans surestimer comme ce serait le cas avec un facteur horaire (`3.6 / 1000`).
+
+---
+
 Ce document sera mis à jour si des modifications interviennent dans la méthode de traitement.
