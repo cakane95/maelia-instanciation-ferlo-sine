@@ -1,4 +1,4 @@
-# Données climatiques brutes – Tour à flux de Diohine (SOB)
+# Données climatiques brutes – Tour à flux de SOB
 
 ## 1. Origine et période des données
 
