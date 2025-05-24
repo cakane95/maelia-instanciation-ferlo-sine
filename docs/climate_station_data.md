@@ -2,10 +2,7 @@
 
 ## 1. Origine et période des données
 
-Les données analysées dans ce fichier proviennent de la tour à flux installée à Niakhar (station SOB) et ont été fournies par Olivier Roupsard (CIRAD).  
-Elles couvrent la période de 2018 à 2024.
-
-Ces mesures proviennent d’une instrumentation automatisée centralisée, enregistrant de nombreuses variables toutes les **30 minutes**.
+Les données analysées dans ce fichier proviennent de la tour à flux installée à Niakhar (station SOB) et ont été fournies par Olivier Roupsard (CIRAD). Elles couvrent la période de 2018 à 2024. Ces mesures proviennent d’une instrumentation automatisée centralisée, enregistrant de nombreuses variables toutes les **30 minutes**.
 
 ---
 
@@ -37,7 +34,7 @@ Objectif : Préparer ces données pour leur utilisation dans MAELIA au format jo
 | TIME_START                       | Horodatage de début de mesure        | YYYYMMDDhhmm |
 | TIME_END                         | Horodatage de fin                    | YYYYMMDDhhmm |
 | Air_Temperature_at_2_m           | Température de l'air à 2 m           | °C           |
-| Precipitation                    | Précipitation (déjà convertie en mm/h) | mm         |
+| Precipitation                    | Précipitation (déjà convertie en mm/h) | mm/h         |
 | Net_radiation_1                  | Rayonnement net global               | W/m²        |
 | Relative_Humidity                | Humidité relative                    | %           |
 
@@ -70,5 +67,25 @@ Objectif : Préparer ces données pour leur utilisation dans MAELIA au format jo
 2. Agrégation journalière selon les règles ci-dessus
 3. Calcul de `ETP` avec la formule de Hargreaves
 4. Structuration finale et export au format MAELIA (un fichier par année)
+
+---
+
+## 8. Remarque importante sur les précipitations
+
+Les valeurs de précipitation (`Precipitation`) présentes dans le fichier ont été transformées en **intensité horaire (mm/h)** à partir de mesures brutes effectuées toutes les **30 minutes**.
+
+D'après le commentaire inclus dans les premières lignes du fichier, chaque valeur a été **multipliée par 2** pour passer de mm/30min à mm/h.
+
+Or, **MAELIA attend des cumuls journaliers réels en mm**, et non des intensités.  
+Il est donc nécessaire de **revenir à l’échelle d’origine avant d’agréger**.
+
+**Méthode appliquée :**
+
+- Chaque valeur de précipitation est **divisée par 2** pour retrouver la valeur en mm/30min
+- La somme des 48 valeurs par jour donne alors un **cumul quotidien correct**
+
+Cette étape de correction est indispensable pour éviter une surestimation des précipitations journalières.
+
+---
 
 Ce document sera mis à jour si des modifications interviennent dans la méthode de traitement.
